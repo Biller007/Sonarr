@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using NzbDrone.Core.Download;
-using NzbDrone.Core.Indexers;
 
 namespace Sonarr.Api.V3.DownloadClient
 {
@@ -10,6 +10,7 @@ namespace Sonarr.Api.V3.DownloadClient
         public int Priority { get; set; }
         public bool RemoveCompletedDownloads { get; set; }
         public bool RemoveFailedDownloads { get; set; }
+        public bool UseTorrentFile { get; set; } // New property to indicate whether to use .torrent file
     }
 
     public class DownloadClientResourceMapper : ProviderResourceMapper<DownloadClientResource, DownloadClientDefinition>
@@ -28,6 +29,7 @@ namespace Sonarr.Api.V3.DownloadClient
             resource.Priority = definition.Priority;
             resource.RemoveCompletedDownloads = definition.RemoveCompletedDownloads;
             resource.RemoveFailedDownloads = definition.RemoveFailedDownloads;
+            resource.UseTorrentFile = !IsMagneticLink(definition.DownloadUrl); // Check if the download link is not magnetic
 
             return resource;
         }
@@ -47,7 +49,25 @@ namespace Sonarr.Api.V3.DownloadClient
             definition.RemoveCompletedDownloads = resource.RemoveCompletedDownloads;
             definition.RemoveFailedDownloads = resource.RemoveFailedDownloads;
 
+            // Update the download URL to use the .torrent file if UseTorrentFile is true
+            if (resource.UseTorrentFile)
+            {
+                definition.DownloadUrl = ConvertToTorrentUrl(definition.DownloadUrl);
+            }
+
             return definition;
+        }
+
+        private bool IsMagneticLink(string downloadUrl)
+        {
+            // Implement logic to check if the download URL is a magnetic link
+            // Return true if it is a magnetic link, false otherwise
+        }
+
+        private string ConvertToTorrentUrl(string downloadUrl)
+        {
+            // Implement logic to convert magnetic link to .torrent file URL
+            // Return the URL of the .torrent file
         }
     }
 }
